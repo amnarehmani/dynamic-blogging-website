@@ -7,6 +7,7 @@ import imageUrlBuilder from '@sanity/image-url';
 
 interface PostPageProps {
   post: Post;
+  params: { slug: string };
 }
 
 // Create the builder for image URLs
@@ -17,7 +18,7 @@ function urlFor(source: any) {
   return builder.image(source);
 }
 
-const Page = async ({ params }: { params: { slug: string } }) => {
+const Page: React.FC<PostPageProps> = async ({ params }) => {
   const query = `*[_type == "post" && slug.current == $slug][0]{
     _id,
     title,
@@ -45,7 +46,7 @@ const Page = async ({ params }: { params: { slug: string } }) => {
       <div className="flex items-center mb-6">
         {post.author?.image && (
           <Image
-            src={urlFor(post.author.image).width(300).height(300).url() || ''} // Generate correct image URL
+            src={urlFor(post.author.image).width(300).height(300).url() || ''}
             alt={post.author.name}
             className="w-12 h-12 rounded-full mr-4"
             width={300}
@@ -58,7 +59,7 @@ const Page = async ({ params }: { params: { slug: string } }) => {
       {/* Main Image */}
       {post.mainImage && (
         <Image
-          src={urlFor(post.mainImage).width(500).height(500).url() || ''} // Generate correct image URL
+          src={urlFor(post.mainImage).width(500).height(500).url() || ''}
           alt={post.title}
           className="w-full h-auto mb-6 object-cover"
           width={500}

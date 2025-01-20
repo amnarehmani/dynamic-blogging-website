@@ -4,11 +4,7 @@ import { Post } from '@/typings';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface Props {
-  posts: Post[];
-}
-
-export default async function Home() {
+async function fetchPosts(): Promise<Post[]> {
   const query = `*[_type == "post"]{
     _id,
     title,
@@ -22,23 +18,25 @@ export default async function Home() {
     publishedAt
   }`;
 
-  const posts: Post[] = await sanityClient.fetch(query);
+  return await sanityClient.fetch(query);
+}
+
+export default async function Home() {
+  const posts = await fetchPosts();
 
   return (
     <>
       <Banner />
       <div>
-        <h1 className='text-center text-4xl font-extrabold p-10 m-8'>Explore Our Blogs.</h1>
+        <h1 className="text-center text-4xl font-extrabold p-10 m-8">Explore Our Blogs.</h1>
       </div>
-      {/* Mapping over posts */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         {posts.map((post) => (
           <div
             key={post._id}
             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 ease-in-out transform hover:scale-105 hover:translate-y-1 motion-safe:transition-all motion-safe:duration-300"
           >
-            {/* Link wrapper around the post image */}
-            <Link href={`/post/${post.slug.current}`} key={post._id}>
+            <Link href={`/post/${post.slug.current}`}>
               {post.mainImage && (
                 <Image
                   src={urlFor(post.mainImage).url()}
@@ -53,7 +51,6 @@ export default async function Home() {
               <h2 className="text-xl font-semibold mb-2 transition-colors duration-300 hover:text-teal-500">{post.title}</h2>
               <p className="text-gray-700 mb-4">{post.description}</p>
               <div className="flex items-center gap-2 mb-2">
-                {/* Author Image */}
                 {post.author?.image && (
                   <Image
                     src={urlFor(post.author.image).url()}
